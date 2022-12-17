@@ -91,7 +91,7 @@ const getClientBySpendingWithinDateRange = async (
     return {
       paid: plainCustomerWithSpending.totalPaid,
       id: plainCustomerWithSpending.Contract.Client.id,
-      fullName: `${plainCustomerWithSpending.Contract.Client.firstName} ${groupedJobs.Contract.Client.lastName}`,
+      fullName: `${plainCustomerWithSpending.Contract.Client.firstName} ${plainCustomerWithSpending.Contract.Client.lastName}`,
     };
   });
 };

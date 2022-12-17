@@ -7,9 +7,19 @@ const { jobController } = require("./controllers/job.controller");
 const { balanceController } = require("./controllers/balance.controller");
 const { adminController } = require("./controllers/admin.controller");
 const ApiError = require("./utils/errors/ApiError");
+const expressWinston = require("express-winston");
+const { getLoggerConfig, logger } = require("./utils/logger");
 const app = express();
 app.use(bodyParser.json());
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpecifications = require("./utils/swagger.json");
+if (process.env.NODE_ENV !== "test") {
+  app.use(expressWinston.logger(getLoggerConfig()));
+}
 
+if (process.env.NODE_ENV !== "production") {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecifications));
+}
 /* Sequelize injection */
 app.set("sequelize", dbConnection);
 app.set("models", dbConnection.models);
@@ -27,7 +37,7 @@ app.use((error, req, res, next) => {
       error: error.message,
     });
   }
-  console.error(error);
+  logger.error(error);
   // default error
   res.status(500).json({
     error: "Internal server error",

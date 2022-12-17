@@ -27,28 +27,34 @@ const getUnpaidJobs = (profileId) =>
       paid: false,
     },
     /* Selecting fewer data for efficiency*/
-    attributes: ["id", "description", "price", "ContractId"],
+    attributes: {
+      exclude: ["Contract"],
+    },
     includeIgnoreAttributes: false,
   });
 
 const payJob = (jobId, profileId) =>
   dbConnection.transaction(async (t) => {
-    const jobToBePaid = await JobModel.findOne({
-      transaction: t,
-      where: {
-        id: jobId,
-      },
-      include: {
-        model: ContractModel,
-        as: "Contract",
+    const jobToBePaid = await JobModel.findOne(
+      {
         where: {
-          ClientId: profileId,
+          id: jobId,
         },
-        attributes: ["ContractorId"],
+        include: {
+          model: ContractModel,
+          as: "Contract",
+          required: true,
+          where: {
+            ClientId: profileId,
+          },
+          attributes: ["ContractorId"],
+        },
       },
-    });
-    if (!jobToBePaid)
-      throw new ApiError(404, "Job with this criteria not found");
+      {
+        transaction: t,
+      }
+    );
+    if (!jobToBePaid) throw new ApiError(404, "Job not found");
     if (jobToBePaid.paid) throw new ApiError(409, "Job already paid");
 
     const [clientProfile, contractorToBePaid] = await Promise.all([
@@ -75,7 +81,22 @@ const payJob = (jobId, profileId) =>
     ]);
     return clientProfile;
   });
+
+const getJobWithClientById = (jobId, clientId) =>
+  JobModel.findOne({
+    where: {
+      id: jobId,
+    },
+    include: {
+      model: ContractModel,
+      as: "Contract",
+      where: {
+        ClientId: clientId,
+      },
+    },
+  });
 module.exports = {
   getUnpaidJobs,
   payJob,
+  getJobWithClientById,
 };

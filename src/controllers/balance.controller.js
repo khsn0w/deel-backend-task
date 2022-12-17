@@ -15,7 +15,8 @@ router.post(
       throw new ApiError(400, "Deposit is only allowed to same profile");
     // only clients should be able to do this
     const client = req.connectedUserProfile;
-    if (!client || client.type !== "client")
+    if (!client) throw new ApiError(404, "Client not found");
+    if (client.type !== "client")
       throw new ApiError(400, "Only client are allowed to do a deposit");
     const { amount } = req.body;
     const updatedClient = await deposit(client, parseInt(receiverId), amount);

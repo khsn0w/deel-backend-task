@@ -1,22 +1,19 @@
 const { Sequelize } = require("sequelize");
+const { logger } = require("../utils/logger");
 /*
-    Connection should be a singleton
+    As mentioned in the DOCS https://sequelize.org/docs/v6/getting-started/#closing-the-connection
+    Sequelize will make sure that one
+    connection will be used for all queries
+
  */
-const ConnectionFactory = (function () {
-  let instance = null;
-  return {
-    getInstance: function () {
-      if (instance == null) {
-        instance = new Sequelize({
-          dialect: "sqlite",
-          storage: "./database.sqlite3",
-        });
-      }
-      return instance;
-    },
-  };
-})();
-const dbConnection = ConnectionFactory.getInstance();
+const dbConnection = new Sequelize({
+  dialect: "sqlite",
+  storage: ":memory:",
+  logging: (sql) => {
+    logger.debug(sql);
+  },
+});
+
 module.exports = {
   dbConnection,
 };

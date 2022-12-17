@@ -1,22 +1,16 @@
-const { Op } = require("sequelize");
+const { getContract } = require("../../services/contract.service");
 
 const canAccessContract = async (req, res, next) => {
   const contractId = req.params.id;
   if (!contractId) return res.status(403).end();
-  const connectedUserProfile = req.connectedUserProfile;
-  const { Contract: ContractModel } = req.app.get("models");
-  const contractBelongsToUser = await ContractModel.findOne({
-    where: {
-      [Op.and]: {
-        id: contractId,
-        [Op.or]: {
-          ContractorId: connectedUserProfile.id,
-          ClientId: connectedUserProfile.id,
-        },
-      },
-    },
-  });
-  if (!contractBelongsToUser) return res.status(403).end();
+  const { id: profileId } = req.connectedUserProfile;
+  const contract = await getContract(contractId);
+
+  if (
+    !contract ||
+    (contract.ContractorId !== profileId && contract.ClientId !== profileId)
+  )
+    return res.status(403).end();
   next();
 };
 

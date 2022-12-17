@@ -1,0 +1,220 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Freelancer Api",
+    "description": "Freelancer API implementation",
+    "version": "v1"
+  },
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/contracts/{id}": {
+      "get": {
+        "summary": "Get contract details by id",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "description": "contractId",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "The user is not authenticated"
+          },
+          "403": {
+            "description": "The user don't have enough privileges"
+          },
+          "404": {
+            "description": "The requested contract is not found"
+          }
+        }
+      }
+    },
+    "/contracts": {
+      "get": {
+        "summary": "Get user non terminated contracts as contractor or client",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "The user is not authenticated"
+          }
+        }
+      }
+    },
+    "/jobs/unpaid": {
+      "get": {
+        "summary": "Get unpaid jobs for the current user only for active contracts",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "The user is not authenticated"
+          }
+        }
+      }
+    },
+    "/jobs/{id}/pay": {
+      "post": {
+        "summary": "Pay a job by Id",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "description": "JobId",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "description": "Job already paid"
+          },
+          "404": {
+            "description": "Job not found"
+          },
+          "400": {
+            "description": "Insufficient balance, deposit and try later!"
+          }
+        }
+      }
+    },
+    "/balances/deposit/{userId}": {
+      "post": {
+        "summary": "Deposit a given amount to a client balance",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "targetClientId",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "amount",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Deposit should go only to the connected profile OR Deposit are only made by profile of type client OR Deposit exceeds the threshold "
+          },
+          "404": {
+            "description": "Client not found"
+          }
+        }
+      }
+    },
+    "/admin/best-profession": {
+      "get": {
+        "summary": "Analytics: get the most earning profession",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "type": "string",
+            "required": true,
+            "default": "2022-12-17T09:00:00.412Z"
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "type": "string",
+            "required": true,
+            "default":"2022-12-17T09:00:00.412Z"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/admin/best-clients": {
+      "get": {
+        "summary": "Analytics: client ordered by spending",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "type": "string",
+            "required": true,
+            "default": "2022-12-18T09:00:00.412Z"
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "type": "string",
+            "required": true,
+            "default": "2022-12-19T09:00:00.412Z"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer",
+            "required": false,
+            "default": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}

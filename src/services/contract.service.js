@@ -16,6 +16,7 @@ const getAllContracts = (profileId) =>
   });
 const getContract = (contractId) =>
   ContractModel.findOne({ where: { id: contractId } });
+
 module.exports = {
   getAllContracts,
   getContract,

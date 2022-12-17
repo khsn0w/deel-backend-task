@@ -32,9 +32,9 @@ const deposit = (client, receiverId, amount) =>
     );
     const depositThreshold = unpaidSum * 0.25;
     if (amount > depositThreshold)
-      throw new ApiError(400, `Deposit limit is ${depositThreshold}`);
+      throw new ApiError(400, "Deposit limit exceeded");
     const amountParsed = parseFloat(amount);
-    client.balance = (client.balance + amountParsed).toFixed(2);
+    client.balance = client.balance + amountParsed;
     await client.save({ transaction: t });
     return client;
   });
